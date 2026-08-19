@@ -45,7 +45,40 @@ package vn.smilecare.chatbot.controller;
  *
  * KHÔNG sửa file của thành viên khác.
  */
+
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import vn.smilecare.chatbot.model.ChatResult;
+
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/api/")
 public class ChatController {
 
-    // TODO (Phương Anh): xóa dòng ghi chú này và triển khai theo hướng dẫn phía trên
+    private final ChatClient chatClient;
+    private final ChatMemory chatMemory;
+
+    public ChatController(ChatClient.Builder chatClient, ChatMemory chatMemory) {
+        this.chatClient = chatClient.build();
+        this.chatMemory = chatMemory;
+    }
+
+    @GetMapping("/chat")
+    public ChatResult chat(@RequestParam String message, @RequestParam(required = false) String conversationId){
+        String sessionId = (conversationId == null || conversationId.isBlank())
+                ? UUID.randomUUID().toString()
+                : conversationId;
+        String answer = chatClient.prompt().user(message).advisors(a -> a.param(chatMemory.CONVERSATION_ID, sessionId)).call().content();
+        return new ChatResult(conversationId, answer);
+    }
+    @GetMapping("/chat/new")
+    public ChatResult createNewChat(){
+        String newConversationId = UUID.randomUUID().toString();
+        return new ChatResult(newConversationId, null);
+    }
 }
