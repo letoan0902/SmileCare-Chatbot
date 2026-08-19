@@ -1,0 +1,12 @@
+# File test API - NGUOI PHU TRACH: TIEN DUC (nhanh feature/demo-test)
+# Mo bang IntelliJ hoac VS Code (extension REST Client) de bam chay tung request.
+# Nhiem vu: bo sung cac request theo 3 kich ban trong docs/demo-conversations.md.
+# Luu y: lay conversationId tu response luot dau va dien vao cac luot sau.
+
+### Luot 1 - mo dau phien moi (khong truyen conversationId)
+GET http://localhost:8080/api/chat?message=Chao phong kham, toi ten Nam, so dien thoai 0901234567
+
+### Luot 2 - thay {{conversationId}} bang ma nhan duoc o luot 1
+GET http://localhost:8080/api/chat?message=Phong kham co bac si chinh nha nao?&conversationId={{conversationId}}
+
+### TODO (Tien Duc): viet tiep cac request cho du 3 kich ban multi-turn
