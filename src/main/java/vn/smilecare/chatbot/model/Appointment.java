@@ -1,9 +1,6 @@
 package vn.smilecare.chatbot.model;
 
-/*
- * Người phụ trách: Văn Vượng
- * Lịch hẹn có thể đổi ngày giờ hoặc hủy.
- */
+
 public class Appointment {
 
     public enum Status {

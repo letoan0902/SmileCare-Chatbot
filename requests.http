@@ -1,12 +1,34 @@
-# File test API - NGUOI PHU TRACH: TIEN DUC (nhanh feature/demo-test)
-# Mo bang IntelliJ hoac VS Code (extension REST Client) de bam chay tung request.
-# Nhiem vu: bo sung cac request theo 3 kich ban trong docs/demo-conversations.md.
-# Luu y: lay conversationId tu response luot dau va dien vao cac luot sau.
+# Test hoi thoai nhieu luot - thay {{conversationId}} bang ma nhan duoc o luot dau
 
-### Luot 1 - mo dau phien moi (khong truyen conversationId)
+### Bat dau phien moi
+GET http://localhost:8080/api/chat/new
+
+### Kich ban 1 - Luot 1: chao va cung cap danh tinh
 GET http://localhost:8080/api/chat?message=Chao phong kham, toi ten Nam, so dien thoai 0901234567
 
-### Luot 2 - thay {{conversationId}} bang ma nhan duoc o luot 1
+### Kich ban 1 - Luot 2: hoi bac si chinh nha
 GET http://localhost:8080/api/chat?message=Phong kham co bac si chinh nha nao?&conversationId={{conversationId}}
 
-### TODO (Tien Duc): viet tiep cac request cho du 3 kich ban multi-turn
+### Kich ban 1 - Luot 3: hoi gia dich vu
+GET http://localhost:8080/api/chat?message=Nieng rang gia bao nhieu?&conversationId={{conversationId}}
+
+### Kich ban 1 - Luot 4: dat lich, chatbot tu dung ten va sdt da biet
+GET http://localhost:8080/api/chat?message=Dat cho toi lich tu van nieng rang voi bac si do, ngay 2026-08-25 luc 10:00&conversationId={{conversationId}}
+
+### Kich ban 2 - Luot 1: yeu cau thieu thong tin, chatbot phai hoi lai
+GET http://localhost:8080/api/chat?message=Toi muon dat lich kham
+
+### Kich ban 2 - Luot tiep: bo sung tung phan thong tin theo cau hoi cua chatbot
+GET http://localhost:8080/api/chat?message=Toi ten Lan, so dien thoai 0912345678&conversationId={{conversationId}}
+
+### Kich ban 3 - Luot 1: dat vao gio da kin (09:00 ngay 2026-08-20 cua bac si Nguyen Thi Mai da co lich mau)
+GET http://localhost:8080/api/chat?message=Toi ten Hung, sdt 0987654321, dat lich Kham tong quat voi bac si Nguyen Thi Mai ngay 2026-08-20 luc 09:00
+
+### Kich ban 3 - Luot 2: doi sang gio trong theo goi y
+GET http://localhost:8080/api/chat?message=Vay cho toi 10:00 cung ngay&conversationId={{conversationId}}
+
+### Kich ban 3 - Luot 3: doi lich vua dat
+GET http://localhost:8080/api/chat?message=Doi lich vua dat sang 2026-08-26 luc 14:00 giup toi&conversationId={{conversationId}}
+
+### Kich ban 3 - Luot 4: huy lich
+GET http://localhost:8080/api/chat?message=Thoi, huy lich do giup toi&conversationId={{conversationId}}

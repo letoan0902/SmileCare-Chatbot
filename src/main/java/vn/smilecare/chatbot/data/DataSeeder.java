@@ -5,10 +5,7 @@ import org.springframework.stereotype.Component;
 import vn.smilecare.chatbot.model.DentalService;
 import vn.smilecare.chatbot.model.Doctor;
 
-/*
- * Người phụ trách: Văn Vượng
- * Nạp dữ liệu mẫu khi ứng dụng khởi động.
- */
+
 @Component
 public class DataSeeder implements CommandLineRunner {
 
@@ -28,6 +25,7 @@ public class DataSeeder implements CommandLineRunner {
         clinicDataStore.addDoctor(new Doctor(2L, "Trần Văn Khoa", "implant"));
         clinicDataStore.addDoctor(new Doctor(3L, "Lê Thị Hồng", "nha tổng quát"));
         clinicDataStore.addDoctor(new Doctor(4L, "Phạm Đức Long", "thẩm mỹ"));
+        clinicDataStore.addDoctor(new Doctor(5L, "Hoàng Minh Tuấn", "nha tổng quát"));
 
         clinicDataStore.addService(new DentalService(1L, "Khám tổng quát", 200_000L));
         clinicDataStore.addService(new DentalService(2L, "Lấy cao răng", 300_000L));
@@ -51,6 +49,30 @@ public class DataSeeder implements CommandLineRunner {
                 "Nhổ răng khôn",
                 "2026-08-20",
                 "14:00"
+        );
+        clinicDataStore.saveAppointment(
+                "Khách mẫu C",
+                "0900000003",
+                "Lê Thị Hồng",
+                "Khám tổng quát",
+                "2026-08-21",
+                "10:00"
+        );
+        clinicDataStore.saveAppointment(
+                "Khách mẫu D",
+                "0900000004",
+                "Phạm Đức Long",
+                "Tẩy trắng răng",
+                "2026-08-21",
+                "15:00"
+        );
+        clinicDataStore.saveAppointment(
+                "Khách mẫu E",
+                "0900000005",
+                "Nguyễn Thị Mai",
+                "Niềng răng (tư vấn)",
+                "2026-08-22",
+                "11:00"
         );
     }
 }

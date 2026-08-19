@@ -105,8 +105,13 @@ public class BookingTools {
             }
         }
 
-        Appointment newAppt = new Appointment(null, request.customerName(), request.phone(), request.doctorName(), request.serviceName(), request.date(), request.time(), Appointment.Status.CONFIRMED);
-        Appointment savedAppt = clinicDataStore.saveAppointment(newAppt);
+        Appointment savedAppt = clinicDataStore.saveAppointment(
+                request.customerName(),
+                request.phone(),
+                request.doctorName(),
+                request.serviceName(),
+                request.date(),
+                request.time());
 
         return BookingResponse.ok(savedAppt.getId(), "Đặt lịch thành công cho khách hàng " + request.customerName() + ".");
     }

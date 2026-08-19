@@ -15,10 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 
-/*
- * Người phụ trách: Văn Vượng
- * Kho dữ liệu in-memory dùng chung cho các tool.
- */
+
 @Component
 public class ClinicDataStore {
 

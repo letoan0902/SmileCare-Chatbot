@@ -1,21 +1,16 @@
-# Cau hinh chung cua ca nhom - khong tu y sua, can thay doi thi thong nhat truoc
 spring:
   application:
     name: smilecare-chatbot
   ai:
     model:
-      chat: openai
-      # tat embedding de ung dung khong doi them cau hinh khong dung den
+      chat: google-genai
       embedding: none
-    openai:
-      # Gemini qua Google AI Studio, endpoint tuong thich chuan OpenAI
-      base-url: https://generativelanguage.googleapis.com/v1beta/openai
-      # API key doc tu bien moi truong, khong ghi cung vao repo
-      api-key: ${GEMINI_API_KEY}
-      chat:
-        completions-path: /chat/completions
-        options:
-          model: gemini-2.5-flash
+    google:
+      genai:
+        api-key: ${GEMINI_API_KEY}
+        chat:
+          options:
+            model: gemini-3.7-flash
 
 server:
   port: 8080

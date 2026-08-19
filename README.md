@@ -140,3 +140,36 @@ curl "http://localhost:8080/api/chat?message=Chao%20phong%20kham"
 2. Hoàn thành phần việc thì tạo Pull Request; ít nhất một thành viên khác review trước khi merge; merge theo thứ tự khuyến nghị ở mục 2.
 3. Sau khi tích hợp đủ, cả nhóm chạy ba kịch bản hội thoại trong `docs/demo-conversations.md`, dán kết quả thật vào file đó làm minh chứng; mỗi thành viên chuẩn bị demo đúng phần mình phụ trách.
 4. Thành viên xong sớm hỗ trợ review và tích hợp, không code hộ phần của người khác trên nhánh của họ.
+
+## 6. Chạy bằng IntelliJ và test bằng Postman
+
+### Chạy server bằng IntelliJ
+
+1. Mở dự án, chờ Gradle sync xong.
+2. Mở Run/Debug Configurations của class `SmileCareChatbotApplication`, vào mục Environment variables và thêm: `GEMINI_API_KEY=api-key-cua-nhom` (bắt buộc, thiếu là ứng dụng không khởi động được vì cấu hình đọc key từ biến môi trường).
+3. Bấm Run. Server nghe tại cổng 8080. Dữ liệu mẫu được nạp sẵn lúc khởi động: 5 bác sĩ, 6 dịch vụ, 5 lịch hẹn (trong đó bác sĩ Nguyễn Thị Mai đã kín giờ 09:00 ngày 2026-08-20 để demo tình huống trùng giờ).
+
+### Test bằng Postman
+
+Endpoint chat dùng phương thức GET với hai tham số query:
+
+- URL: `http://localhost:8080/api/chat`
+- Params: `message` (bắt buộc) và `conversationId` (bỏ trống ở lượt đầu).
+
+Các bước demo một phiên hội thoại nhiều lượt:
+
+1. Tạo request GET tới `http://localhost:8080/api/chat`, tab Params thêm key `message` với value là câu chat, ví dụ: `Chào phòng khám, tôi tên Nam, số điện thoại 0901234567`. Lượt đầu không thêm `conversationId`. Bấm Send.
+2. Response trả về JSON dạng `{"conversationId": "...", "answer": "..."}`. Copy giá trị `conversationId`.
+3. Từ lượt thứ hai trở đi, thêm param `conversationId` với giá trị vừa copy rồi đổi nội dung `message`. Cùng một `conversationId` thì chatbot nhớ toàn bộ ngữ cảnh trước đó.
+4. Muốn bắt đầu phiên mới: bỏ param `conversationId` đi (hoặc gọi `GET http://localhost:8080/api/chat/new` để lấy mã phiên mới).
+
+Kịch bản mẫu để demo theo dữ liệu có sẵn (chạy lần lượt trên cùng một `conversationId`):
+
+- `Chào phòng khám, tôi tên Nam, số điện thoại 0901234567`
+- `Phòng khám có bác sĩ chỉnh nha nào?` (chatbot gọi tool tìm bác sĩ, trả về bác sĩ Nguyễn Thị Mai)
+- `Bác sĩ Mai còn giờ nào trống ngày 2026-08-20?` (tool tra lịch trống, danh sách không có 09:00 vì đã kín)
+- `Đặt cho tôi lịch Niềng răng (tư vấn) với bác sĩ Mai ngày 2026-08-20 lúc 09:00` (tool đặt lịch trả lỗi trùng giờ, chatbot đề xuất giờ khác)
+- `Vậy 10:00 nhé` (đặt thành công, chatbot tự dùng tên và số điện thoại đã cung cấp ở lượt đầu, trả về mã lịch hẹn)
+- `Đổi lịch vừa đặt sang 14:00 cùng ngày` rồi `Hủy lịch đó giúp tôi` (demo đổi và hủy)
+
+Ngoài Postman có thể demo bằng giao diện web có sẵn tại `http://localhost:8080/` (trang chat tự quản lý conversationId).
