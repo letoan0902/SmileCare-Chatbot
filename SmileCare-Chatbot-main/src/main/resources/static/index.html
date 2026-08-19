@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  NGUOI PHU TRACH: TIEN DUC (nhanh feature/demo-test)
+  NHIEM VU: trang chat don gian de ca nhom demo truc quan.
+  ============================================================
+
+  HUONG DAN LAM:
+  1. Dung HTML + JavaScript thuan, khong can framework.
+  2. Giao dien gom: khung hien thi hoi thoai, o nhap tin nhan, nut gui,
+     nut "Phien moi".
+  3. JavaScript giu bien conversationId (ban dau null):
+     - Khi gui: fetch GET /api/chat?message=...&conversationId=...
+       (bo tham so conversationId neu dang null).
+     - Doc response JSON { conversationId, answer }: luu lai
+       conversationId cho luot sau, in cau tra loi ra khung chat.
+     - Nut "Phien moi": dat conversationId ve null va xoa khung chat.
+  4. Trang nay Spring Boot tu phuc vu tai http://localhost:8080/
+     (file tinh trong resources/static).
+
+  TODO (Tien Duc): thay noi dung placeholder duoi day bang giao dien that.
+-->
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>SmileCare Chatbot - Demo</title>
+</head>
+<body>
+    <p>Khung giao dien demo - Tien Duc trien khai theo huong dan trong comment cua file nay.</p>
+</body>
+</html>
