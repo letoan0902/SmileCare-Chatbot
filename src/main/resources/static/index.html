@@ -1,31 +1,454 @@
 <!DOCTYPE html>
-<!--
-  ============================================================
-  NGUOI PHU TRACH: TIEN DUC (nhanh feature/demo-test)
-  NHIEM VU: trang chat don gian de ca nhom demo truc quan.
-  ============================================================
-
-  HUONG DAN LAM:
-  1. Dung HTML + JavaScript thuan, khong can framework.
-  2. Giao dien gom: khung hien thi hoi thoai, o nhap tin nhan, nut gui,
-     nut "Phien moi".
-  3. JavaScript giu bien conversationId (ban dau null):
-     - Khi gui: fetch GET /api/chat?message=...&conversationId=...
-       (bo tham so conversationId neu dang null).
-     - Doc response JSON { conversationId, answer }: luu lai
-       conversationId cho luot sau, in cau tra loi ra khung chat.
-     - Nut "Phien moi": dat conversationId ve null va xoa khung chat.
-  4. Trang nay Spring Boot tu phuc vu tai http://localhost:8080/
-     (file tinh trong resources/static).
-
-  TODO (Tien Duc): thay noi dung placeholder duoi day bang giao dien that.
--->
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SmileCare Chatbot - Demo</title>
+    <style>
+        :root {
+            --bg: #f4f7fb;
+            --panel: #ffffff;
+            --border: #d7deea;
+            --text: #16324f;
+            --muted: #6b7a90;
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --user: #e8f1ff;
+            --bot: #f6f8fc;
+            --shadow: 0 18px 45px rgba(22, 50, 79, 0.10);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background:
+                linear-gradient(180deg, rgba(37, 99, 235, 0.06), transparent 280px),
+                var(--bg);
+            color: var(--text);
+        }
+
+        .app {
+            min-height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .chat-shell {
+            width: min(960px, 100%);
+            height: min(92vh, 860px);
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            background: linear-gradient(180deg, #ffffff, #fbfcff);
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 20px;
+            line-height: 1.2;
+        }
+
+        .brand p {
+            margin: 4px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .session {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--muted);
+            font-size: 13px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+            text-align: right;
+        }
+
+        .badge {
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #eef4ff;
+            color: #1d4ed8;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        .chat-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background:
+                radial-gradient(circle at top left, rgba(37, 99, 235, 0.04), transparent 32%),
+                linear-gradient(180deg, #ffffff, #fbfcff);
+        }
+
+        .empty-state {
+            height: 100%;
+            min-height: 240px;
+            display: grid;
+            place-items: center;
+            color: var(--muted);
+            text-align: center;
+            padding: 24px;
+        }
+
+        .empty-state strong {
+            display: block;
+            color: var(--text);
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .message {
+            display: flex;
+            margin: 0 0 14px;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .bubble {
+            max-width: min(82%, 680px);
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.5;
+            font-size: 15px;
+        }
+
+        .message.user .bubble {
+            background: var(--user);
+            border-color: #c9dbff;
+            border-bottom-right-radius: 6px;
+        }
+
+        .message.bot .bubble {
+            background: var(--bot);
+            border-bottom-left-radius: 6px;
+        }
+
+        .composer {
+            border-top: 1px solid var(--border);
+            padding: 16px;
+            background: #fff;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .input-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 54px;
+            max-height: 180px;
+            resize: vertical;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 15px;
+            font: inherit;
+            color: var(--text);
+            outline: none;
+            background: #fff;
+        }
+
+        textarea:focus {
+            border-color: #8bb0ff;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        button {
+            border: 0;
+            border-radius: 12px;
+            padding: 13px 16px;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: #eef2f7;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: #e6ebf3;
+        }
+
+        .status {
+            margin-top: 8px;
+            min-height: 20px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .status.error {
+            color: #b42318;
+        }
+
+        .status.loading {
+            color: #1d4ed8;
+        }
+
+        @media (max-width: 720px) {
+            .app {
+                padding: 12px;
+            }
+
+            .chat-shell {
+                height: calc(100vh - 24px);
+                border-radius: 14px;
+            }
+
+            .chat-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .session {
+                justify-content: flex-start;
+                text-align: left;
+            }
+
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .actions {
+                width: 100%;
+            }
+
+            .actions button {
+                flex: 1;
+            }
+        }
+    </style>
 </head>
 <body>
-    <p>Khung giao dien demo - Tien Duc trien khai theo huong dan trong comment cua file nay.</p>
+    <div class="app">
+        <main class="chat-shell">
+            <header class="chat-header">
+                <div class="brand">
+                    <h1>SmileCare Chatbot</h1>
+                    <p>Chào mừng đến với Spring Boot</p>
+                </div>
+                <div class="session">
+                    <span class="badge" id="sessionBadge">Phiên mới</span>
+                </div>
+            </header>
+
+            <section class="chat-body">
+                <div class="messages" id="messages">
+                    <div class="empty-state" id="emptyState">
+                        <div>
+                            <strong>Bắt đầu cuộc trò chuyện</strong>
+                            <div>Mời bạn nhập tin nhắn chat.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="composer">
+                    <div class="toolbar">
+                        <div class="input-wrap">
+                            <label for="messageInput">Tin nhắn</label>
+                            <textarea id="messageInput" placeholder="Nhập câu hỏi của bạn..." rows="2"></textarea>
+                        </div>
+                        <div class="actions">
+                            <button type="button" class="btn-secondary" id="newSessionBtn">Phiên mới</button>
+                            <button type="button" class="btn-primary" id="sendBtn">Gửi</button>
+                        </div>
+                    </div>
+                    <div class="status" id="status"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        let conversationId = null;
+
+        const messagesEl = document.getElementById('messages');
+        const emptyStateEl = document.getElementById('emptyState');
+        const messageInputEl = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const newSessionBtn = document.getElementById('newSessionBtn');
+        const statusEl = document.getElementById('status');
+        const sessionBadgeEl = document.getElementById('sessionBadge');
+        const sessionTextEl = document.getElementById('sessionText');
+
+        function renderSession() {
+            if (conversationId) {
+                sessionBadgeEl.textContent = 'Đang hoạt động';
+                sessionTextEl.textContent = 'conversationId: ' + conversationId;
+            } else {
+                sessionBadgeEl.textContent = 'Phiên mới';
+                sessionTextEl.textContent = 'conversationId: null';
+            }
+        }
+
+        function setStatus(message, type = '') {
+            statusEl.textContent = message || '';
+            statusEl.className = 'status' + (type ? ' ' + type : '');
+        }
+
+        function scrollToBottom() {
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+
+        function clearEmptyState() {
+            if (emptyStateEl) {
+                emptyStateEl.remove();
+            }
+        }
+
+        function appendMessage(role, text) {
+            clearEmptyState();
+
+            const row = document.createElement('div');
+            row.className = 'message ' + role;
+
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.textContent = text;
+
+            row.appendChild(bubble);
+            messagesEl.appendChild(row);
+            scrollToBottom();
+        }
+
+        function resetChat() {
+            conversationId = null;
+            messagesEl.innerHTML = '';
+            messagesEl.appendChild(emptyStateEl);
+            messageInputEl.value = '';
+            setStatus('');
+            renderSession();
+        }
+
+        async function sendMessage() {
+            const message = messageInputEl.value.trim();
+            if (!message) {
+                setStatus('Hãy nhập nội dung tin nhắn .', 'error');
+                messageInputEl.focus();
+                return;
+            }
+
+            appendMessage('user', message);
+            messageInputEl.value = '';
+            messageInputEl.focus();
+
+            const params = new URLSearchParams();
+            params.set('message', message);
+            if (conversationId) {
+                params.set('conversationId', conversationId);
+            }
+
+            setStatus('Đang gửi yêu cầu...', 'loading');
+            sendBtn.disabled = true;
+            newSessionBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/chat?' + params.toString(), {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+
+                const data = await response.json();
+                conversationId = data.conversationId ?? null;
+                renderSession();
+                appendMessage('bot', data.answer ?? '');
+                setStatus('Đã nhận trả lời.');
+            } catch (error) {
+                setStatus('Hệ thông đang bị lỗi mời kiểm tra lại.', 'error');
+                appendMessage('bot', 'Xin lỗi, hệ thống ko thể kết nối với máy chủ.');
+                console.error(error);
+            } finally {
+                sendBtn.disabled = false;
+                newSessionBtn.disabled = false;
+            }
+        }
+
+        sendBtn.addEventListener('click', sendMessage);
+        newSessionBtn.addEventListener('click', resetChat);
+
+        messageInputEl.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+
+        renderSession();
+    </script>
 </body>
 </html>
