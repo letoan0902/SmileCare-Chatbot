@@ -1,30 +1,56 @@
 package vn.smilecare.chatbot.data;
 
-/*
- * ============================================================
- * NGƯỜI PHỤ TRÁCH: VĂN VƯỢNG (nhánh feature/data-layer)
- * NHIỆM VỤ: Nạp dữ liệu mẫu khi ứng dụng khởi động.
- * ============================================================
- *
- * HƯỚNG DẪN LÀM:
- *
- * 1. Đánh dấu class là @Component và implement CommandLineRunner
- *    (import org.springframework.boot.CommandLineRunner), inject
- *    ClinicDataStore qua constructor, nạp dữ liệu trong run().
- *
- * 2. Dữ liệu mẫu đã thống nhất:
- *    - 4 bác sĩ: Nguyễn Thị Mai (chỉnh nha), Trần Văn Khoa (implant),
- *      Lê Thị Hồng (nha tổng quát), Phạm Đức Long (thẩm mỹ).
- *    - 6 dịch vụ: Khám tổng quát 200000, Lấy cao răng 300000,
- *      Trám răng 500000, Nhổ răng khôn 1500000, Niềng răng (tư vấn)
- *      500000, Tẩy trắng răng 2500000.
- *    - Nên tạo sẵn 1-2 lịch hẹn mẫu để tool tra lịch trống có dữ liệu
- *      loại trừ ngay từ đầu (ví dụ bác sĩ Nguyễn Thị Mai đã kín giờ
- *      09:00 một ngày gần đây).
- *
- * KHÔNG sửa file của thành viên khác.
- */
-public class DataSeeder {
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
+import vn.smilecare.chatbot.model.DentalService;
+import vn.smilecare.chatbot.model.Doctor;
 
-    // TODO (Văn Vượng): triển khai theo hướng dẫn rồi xóa ghi chú này
+/*
+ * Người phụ trách: Văn Vượng
+ * Nạp dữ liệu mẫu khi ứng dụng khởi động.
+ */
+@Component
+public class DataSeeder implements CommandLineRunner {
+
+    private final ClinicDataStore clinicDataStore;
+
+    public DataSeeder(ClinicDataStore clinicDataStore) {
+        this.clinicDataStore = clinicDataStore;
+    }
+
+    @Override
+    public void run(String... args) {
+        if (!clinicDataStore.findAllDoctors().isEmpty() || !clinicDataStore.findAllServices().isEmpty()) {
+            return;
+        }
+
+        clinicDataStore.addDoctor(new Doctor(1L, "Nguyễn Thị Mai", "chỉnh nha"));
+        clinicDataStore.addDoctor(new Doctor(2L, "Trần Văn Khoa", "implant"));
+        clinicDataStore.addDoctor(new Doctor(3L, "Lê Thị Hồng", "nha tổng quát"));
+        clinicDataStore.addDoctor(new Doctor(4L, "Phạm Đức Long", "thẩm mỹ"));
+
+        clinicDataStore.addService(new DentalService(1L, "Khám tổng quát", 200_000L));
+        clinicDataStore.addService(new DentalService(2L, "Lấy cao răng", 300_000L));
+        clinicDataStore.addService(new DentalService(3L, "Trám răng", 500_000L));
+        clinicDataStore.addService(new DentalService(4L, "Nhổ răng khôn", 1_500_000L));
+        clinicDataStore.addService(new DentalService(5L, "Niềng răng (tư vấn)", 500_000L));
+        clinicDataStore.addService(new DentalService(6L, "Tẩy trắng răng", 2_500_000L));
+
+        clinicDataStore.saveAppointment(
+                "Khách mẫu A",
+                "0900000001",
+                "Nguyễn Thị Mai",
+                "Niềng răng (tư vấn)",
+                "2026-08-20",
+                "09:00"
+        );
+        clinicDataStore.saveAppointment(
+                "Khách mẫu B",
+                "0900000002",
+                "Trần Văn Khoa",
+                "Nhổ răng khôn",
+                "2026-08-20",
+                "14:00"
+        );
+    }
 }
