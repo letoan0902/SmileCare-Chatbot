@@ -1,22 +1,85 @@
 package vn.smilecare.chatbot.model;
 
 /*
- * ============================================================
- * NGƯỜI PHỤ TRÁCH: VĂN VƯỢNG (nhánh feature/data-layer)
- * NHIỆM VỤ: Lớp lịch hẹn - đối tượng nghiệp vụ trung tâm.
- * ============================================================
- *
- * HƯỚNG DẪN LÀM:
- * - Đây nên là class thường (không phải record) vì trạng thái thay đổi
- *   được: đổi ngày giờ khi reschedule, đổi status khi hủy.
- * - Trường cần có: Long id; String customerName; String phone;
- *   String doctorName; String serviceName; String date (yyyy-MM-dd);
- *   String time (HH:mm); Status status.
- * - Khai báo enum Status { CONFIRMED, CANCELLED } ngay trong class.
- * - Viết constructor đủ trường, getter cho tất cả, setter cho date,
- *   time, status (chỉ những gì cho phép thay đổi).
+ * Người phụ trách: Văn Vượng
+ * Lịch hẹn có thể đổi ngày giờ hoặc hủy.
  */
 public class Appointment {
 
-    // TODO (Văn Vượng): triển khai theo hướng dẫn rồi xóa ghi chú này
+    public enum Status {
+        CONFIRMED,
+        CANCELLED
+    }
+
+    private final Long id;
+    private final String customerName;
+    private final String phone;
+    private final String doctorName;
+    private final String serviceName;
+    private String date;
+    private String time;
+    private Status status;
+
+    public Appointment(
+            Long id,
+            String customerName,
+            String phone,
+            String doctorName,
+            String serviceName,
+            String date,
+            String time,
+            Status status) {
+        this.id = id;
+        this.customerName = customerName;
+        this.phone = phone;
+        this.doctorName = doctorName;
+        this.serviceName = serviceName;
+        this.date = date;
+        this.time = time;
+        this.status = status;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public String getDoctorName() {
+        return doctorName;
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 }
