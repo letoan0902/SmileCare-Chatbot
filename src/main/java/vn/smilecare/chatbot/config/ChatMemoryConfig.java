@@ -36,7 +36,21 @@ package vn.smilecare.chatbot.config;
  *
  * KHÔNG sửa file của thành viên khác.
  */
+
+import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
+import org.springframework.ai.chat.memory.MessageWindowChatMemory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
 public class ChatMemoryConfig {
 
-    // TODO (Phương Anh): xóa dòng ghi chú này và triển khai theo hướng dẫn phía trên
+    @Bean
+    public ChatMemory chatMemory(ChatMemory chatMemory){
+        return MessageWindowChatMemory.builder().maxMessages(20).chatMemoryRepository(new InMemoryChatMemoryRepository()).build();
+    }
+
+
+
 }
